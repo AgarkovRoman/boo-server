@@ -13,6 +13,7 @@ import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TASK_NOT_FOUND } from './task.constants';
 import { isValidObjectId } from 'mongoose';
+import { IdValidationPipe } from '../pipes/id-validation.pipe';
 
 @Controller('task')
 export class TaskController {
@@ -24,12 +25,7 @@ export class TaskController {
   }
 
   @Delete(':id')
-  async deleteTasksById(@Param('id') id: string) {
-    // TODO: try to use try catch
-    if (!isValidObjectId(id)) {
-      throw new HttpException(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);
-    }
-
+  async deleteTasksById(@Param('id', IdValidationPipe) id: string) {
     const deletedDoc = await this.tasksService.deleteTaskById(id);
 
     if (!deletedDoc) {
@@ -40,28 +36,18 @@ export class TaskController {
   }
 
   @Get('byUser/:userId')
-  async getTasksByUserId(@Param('userId') userId: string) {
+  async getTasksByUserId(@Param('userId', IdValidationPipe) userId: string) {
     return this.tasksService.getTasksByUserId(userId);
   }
 
   @Patch(':id')
-  async updateTasksById(@Param('id') id: string, @Body() dto: CreateTaskDto) {
-    if (!isValidObjectId(id)) {
-      throw new HttpException(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);
-    }
-    const updateTask = await this.tasksService.updateTaskById(id, dto);
+  async updateTasksById(@Param('id', IdValidationPipe) id: string, @Body() dto: CreateTaskDto) {
+    const updatedTask = await this.tasksService.updateTaskById(id, dto);
 
-    if (!updateTask) {
+    if (!updatedTask) {
       throw new HttpException(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    return updateTask;
+    return updatedTask;
   }
-
-  // @ApiOperation({ summary: 'Get task by projects id' })
-  // @ApiResponse({ status: 200, type: [TaskModel] })
-  // @Get()
-  // getTasksByProjectId(@Body() dto: GetTaskDto) {
-  //   return this.tasksService.getTasksByProjectId(dto.projectId);
-  // }
 }

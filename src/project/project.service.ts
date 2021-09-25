@@ -31,4 +31,13 @@ export class ProjectsService {
       .find({ userId: Types.ObjectId(userId) })
       .exec();
   }
+
+  async updateProjectById(
+    id: string,
+    dto: CreateProjectDto,
+  ): Promise<DocumentType<ProjectModel> | null> {
+    return this.projectRepository
+      .findByIdAndUpdate(id, dto, { new: true, useFindAndModify: false })
+      .exec();
+  }
 }
