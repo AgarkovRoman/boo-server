@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypegooseModule } from 'nestjs-typegoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getMongoConfig } from './configs/mongo.config';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { TopPageModule } from './top-page/top-page.module';
 import { ProductModule } from './product/product.module';
@@ -12,15 +11,18 @@ import { ProjectModule } from './project/project.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypegooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: getMongoConfig,
-    }),
+    TypegooseModule.forRoot(
+      'mongodb+srv://boo-boo:f5dn5xvmRfzVhqxX@cluster0.dqwhz.mongodb.net/booboo?retryWrites=true&w=majority',
+      {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
+      },
+    ),
     AuthModule,
-    TopPageModule,
-    ProductModule,
-    ReviewModule,
+    // TopPageModule,
+    // ProductModule,
+    // ReviewModule,
     TaskModule,
     ProjectModule,
   ],

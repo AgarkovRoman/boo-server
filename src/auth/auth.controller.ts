@@ -17,16 +17,12 @@ import { ALREADY_REGISTERED_USER } from './auth.constants';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @ApiOperation({ summary: 'Registration' })
-  // @ApiResponse({ status: 200 })
   @UsePipes(new ValidationPipe())
+  // @ApiOperation({ summary: 'Log in' })
+  // @ApiResponse({ status: 200 })
   @Post('/registration')
-  async register(@Body() dto: AuthDto) {
-    const candidate = await this.authService.findUser(dto.login);
-    if (candidate) {
-      throw new BadRequestException(ALREADY_REGISTERED_USER);
-    }
-    return this.authService.createUser(dto);
+  async registration(@Body() dto: AuthDto) {
+    return this.authService.registration(dto);
   }
 
   @HttpCode(200)
@@ -34,8 +30,7 @@ export class AuthController {
   // @ApiResponse({ status: 200 })
   @UsePipes(new ValidationPipe())
   @Post('/login')
-  async login(@Body() { login, password }: AuthDto) {
-    const user = await this.authService.validateUser(login, password);
-    return this.authService.login(user.email);
+  async login(@Body() dto: AuthDto) {
+    return this.authService.login(dto);
   }
 }
