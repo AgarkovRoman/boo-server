@@ -3,6 +3,7 @@ import { ProjectsService } from './project.service';
 import { ProjectsController } from './project.controller';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { ProjectModel } from './project.model';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   controllers: [ProjectsController],
@@ -15,6 +16,7 @@ import { ProjectModel } from './project.model';
         },
       },
     ]),
+    AuthModule,
   ],
   providers: [ProjectsService],
 })

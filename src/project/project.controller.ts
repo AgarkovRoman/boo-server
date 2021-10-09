@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Param,
   Patch,
-  Post,
+  Post, Request,
 } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectsService } from './project.service';
@@ -34,10 +34,9 @@ export class ProjectsController {
     return deletedDoc;
   }
 
-  // TODO: сделать по токену, а не по id
-  @Get('byUser/:userId')
-  async getProjectsByUserId(@Param('userId', IdValidationPipe) userId: string) {
-    return this.projectsService.getProjectsByUserId(userId);
+  @Get('byUser')
+  async getProjectsByUserId(@Request() req: any) {
+    return this.projectsService.getProjectsByUserId(req);
   }
 
   @Patch(':id')
