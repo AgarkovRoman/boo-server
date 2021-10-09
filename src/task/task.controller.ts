@@ -7,12 +7,12 @@ import {
   HttpStatus,
   Param,
   Patch,
+  Request,
   Post,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TASK_NOT_FOUND } from './task.constants';
-import { isValidObjectId } from 'mongoose';
 import { IdValidationPipe } from '../pipes/id-validation.pipe';
 
 @Controller('task')
@@ -35,9 +35,9 @@ export class TaskController {
     return deletedDoc;
   }
 
-  @Get('byUser/:userId')
-  async getTasksByUserId(@Param('userId', IdValidationPipe) userId: string) {
-    return this.tasksService.getTasksByUserId(userId);
+  @Get('byUser')
+  async getTasksByUserId(@Request() req: any) {
+    return this.tasksService.getTasksByUserId(req);
   }
 
   @Patch(':id')

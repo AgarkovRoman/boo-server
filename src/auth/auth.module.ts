@@ -10,6 +10,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
   imports: [
     TypegooseModule.forFeature([
@@ -28,6 +29,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
     PassportModule,
   ],
-  providers: [AuthService, JwtStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}

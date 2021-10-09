@@ -58,6 +58,24 @@ export class AuthService {
     };
   }
 
+  async getUserIdFromJWT(req: {
+    headers: { authorization: string };
+  }): Promise<string> {
+    const authHeader = req.headers.authorization;
+    const bearer = authHeader.split(' ')[0];
+    const token = authHeader.split(' ')[1];
+
+    if (bearer !== 'Bearer' || !token) {
+      throw new UnauthorizedException({ message: 'User unauthorized' });
+    }
+    try {
+      const verifyUser = this.jwtService.verify(token);
+      return verifyUser.id;
+    } catch (e) {
+      throw new UnauthorizedException({ message: 'User unauthorized' });
+    }
+  }
+
   async login(userDto: AuthDto) {
     const user = await this.validateUser(userDto);
     const token = await this.generateToken(user);

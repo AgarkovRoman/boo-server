@@ -3,8 +3,10 @@ import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { TaskModel } from './task.model';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
+  providers: [TaskService],
   controllers: [TaskController],
   imports: [
     TypegooseModule.forFeature([
@@ -15,7 +17,8 @@ import { TaskModel } from './task.model';
         },
       },
     ]),
+    AuthModule,
   ],
-  providers: [TaskService],
+  exports: [TaskService]
 })
 export class TaskModule {}

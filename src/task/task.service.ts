@@ -1,15 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ModelType, DocumentType } from '@typegoose/typegoose/lib/types';
 import { InjectModel } from 'nestjs-typegoose';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskModel } from './task.model';
 import { Types } from 'mongoose';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectModel(TaskModel)
     private readonly taskRepository: ModelType<TaskModel>,
+    private readonly authService: AuthService,
   ) {}
 
   async createTask(dto: CreateTaskDto): Promise<DocumentType<TaskModel>> {
@@ -29,7 +31,8 @@ export class TaskService {
       .exec();
   }
 
-  async getTasksByUserId(userId: string): Promise<DocumentType<TaskModel>[]> {
+  async getTasksByUserId(req: any): Promise<DocumentType<TaskModel>[]> {
+    const userId = await this.authService.getUserIdFromJWT(req);
     return this.taskRepository.find({ userId: Types.ObjectId(userId) }).exec();
   }
 
