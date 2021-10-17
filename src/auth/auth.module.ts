@@ -8,9 +8,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getJWTConfig } from '../configs/jwt.config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RefreshTokenServiceService } from './refreshToken.service';
+import { RefreshTokenModel } from './refreshToken.model';
 
 @Module({
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, RefreshTokenServiceService],
   controllers: [AuthController],
   imports: [
     TypegooseModule.forFeature([
@@ -18,6 +20,12 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         typegooseClass: UserModel,
         schemaOptions: {
           collection: 'User',
+        },
+      },
+      {
+        typegooseClass: RefreshTokenModel,
+        schemaOptions: {
+          collection: 'RefreshToken',
         },
       },
     ]),
@@ -29,6 +37,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
     PassportModule,
   ],
-  exports: [AuthService],
+  exports: [AuthService, RefreshTokenServiceService],
 })
 export class AuthModule {}

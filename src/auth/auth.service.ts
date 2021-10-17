@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ModelType } from '@typegoose/typegoose/lib/types';
@@ -13,6 +14,10 @@ import {
   INVALID_EMAIL_OR_PASSWORD,
 } from './auth.constants';
 import { JwtService } from '@nestjs/jwt';
+import { v4 as uuid } from 'uuid';
+import { RefreshTokenServiceService } from './refreshToken.service';
+import { Types } from 'mongoose';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +25,7 @@ export class AuthService {
     @InjectModel(UserModel)
     private readonly userModel: ModelType<UserModel>,
     private readonly jwtService: JwtService,
+    private readonly refreshTokenServiceService: RefreshTokenServiceService,
   ) {}
 
   private async createUser(dto: AuthDto) {
@@ -51,11 +57,13 @@ export class AuthService {
     return user;
   }
 
-  private async generateToken(user: UserModel) {
-    const payload = { id: user._id, email: user.email };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+  private async generateToken(id: Types.ObjectId) {
+    return this.jwtService.signAsync(
+      { id },
+      {
+        expiresIn: '30d',
+      },
+    );
   }
 
   async getUserIdFromJWT(req: {
@@ -76,12 +84,25 @@ export class AuthService {
     }
   }
 
+  private async issueTokenPair(userId: string) {
+    const refreshToken = uuid();
+    await this.refreshTokenServiceService.createRefreshToken({
+      refreshToken,
+      userId,
+    });
+    const access_token = await this.generateToken(userId);
+    return {
+      access_token,
+      refreshToken,
+    };
+  }
+
   async login(userDto: AuthDto) {
     const user = await this.validateUser(userDto);
-    const token = await this.generateToken(user);
+    const tokenPair = await this.issueTokenPair(user.id);
     return {
-      ...token,
-      id: user._id,
+      ...tokenPair,
+      id: user.id,
     };
   }
 
@@ -91,10 +112,32 @@ export class AuthService {
       throw new BadRequestException(ALREADY_REGISTERED_USER);
     }
     const user = await this.createUser(userDto);
-    const token = await this.generateToken(user);
+    const tokenPair = await this.issueTokenPair(user.id);
     return {
-      ...token,
-      id: user._id,
+      ...tokenPair,
+      id: user.id,
+    };
+  }
+
+  async refresh(dto: RefreshTokenDto) {
+    const { token: refreshToken, userId } = dto;
+    const dbToken = await this.refreshTokenServiceService.findRefreshToken(
+      refreshToken,
+    );
+    if (!dbToken) {
+      throw new NotFoundException('refreshToken not found');
+    }
+    await this.refreshTokenServiceService.deleteRefreshToken(refreshToken);
+    const tokenPair = await this.issueTokenPair(userId);
+    return {
+      ...tokenPair,
+    };
+  }
+
+  async logout(token: string) {
+    await this.refreshTokenServiceService.deleteRefreshToken(token);
+    return {
+      success: true,
     };
   }
 }
