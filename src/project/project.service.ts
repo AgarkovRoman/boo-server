@@ -5,6 +5,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectModel } from './project.model';
 import { Types } from 'mongoose';
 import { AuthService } from '../auth/auth.service';
+import { Project } from './project.types';
 
 @Injectable()
 export class ProjectsService {
@@ -16,23 +17,46 @@ export class ProjectsService {
 
   async createProject(
     dto: CreateProjectDto,
-  ): Promise<DocumentType<ProjectModel>> {
-    return this.projectRepository.create(dto);
+    req: any,
+  ): Promise<Project> {
+    const userId = await this.authService.getUserIdFromJWT(req);
+    const createDto = {
+      userId,
+      ...dto
+    };
+    const project: DocumentType<ProjectModel> = await this.projectRepository.create(createDto);
+    const { _id, name, description } = project;
+    return {
+      id: _id,
+      name,
+      description,
+    };
   }
 
   async deleteProjectById(
     id: string,
-  ): Promise<DocumentType<ProjectModel> | null> {
-    return this.projectRepository.findByIdAndDelete(id).exec();
+  ): Promise<{success: boolean}> {
+    const deletedProject: DocumentType<ProjectModel> | null = await this.projectRepository.findByIdAndDelete(id).exec();
+    if (deletedProject) {
+      return { success: true };
+    }
+    return { success: false };
   }
 
   async getProjectsByUserId(
     req: any,
-  ): Promise<DocumentType<ProjectModel>[]> {
+  ): Promise<Project[]> {
     const userId = await this.authService.getUserIdFromJWT(req);
-    return this.projectRepository
+    const projects: DocumentType<ProjectModel>[] = await this.projectRepository
       .find({ userId: Types.ObjectId(userId) })
       .exec();
+    return projects.map(({ _id, name, description }) => {
+      return {
+        id: _id,
+        name,
+        description,
+      };
+    });
   }
 
   async updateProjectById(

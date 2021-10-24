@@ -72,7 +72,6 @@ export class AuthService {
     const authHeader = req.headers.authorization;
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
-
     if (bearer !== 'Bearer' || !token) {
       throw new UnauthorizedException({ message: 'User unauthorized' });
     }
@@ -90,9 +89,9 @@ export class AuthService {
       refreshToken,
       userId,
     });
-    const access_token = await this.generateToken(userId);
+    const accessToken = await this.generateToken(userId);
     return {
-      access_token,
+      accessToken,
       refreshToken,
     };
   }

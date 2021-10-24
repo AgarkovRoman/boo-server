@@ -21,13 +21,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 export class TaskController {
   constructor(private readonly tasksService: TaskService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('create')
-  async createTask(@Body() dto: CreateTaskDto) {
-    return this.tasksService.createTask(dto);
+  async createTask(@Body() dto: CreateTaskDto, @Request() req: any) {
+    return this.tasksService.createTask(dto, req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteTasksById(@Param('id', IdValidationPipe) id: string) {
     const deletedDoc = await this.tasksService.deleteTaskById(id);
@@ -39,13 +39,13 @@ export class TaskController {
     return deletedDoc;
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('byUser')
   async getTasksByUserId(@Request() req: any) {
     return this.tasksService.getTasksByUserId(req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateTasksById(
     @Param('id', IdValidationPipe) id: string,

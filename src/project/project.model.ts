@@ -9,7 +9,7 @@ export class ProjectModel extends TimeStamps {
   name: string;
 
   @prop()
-  description?: string;
+  description: string;
 
   @prop()
   userId: Types.ObjectId;

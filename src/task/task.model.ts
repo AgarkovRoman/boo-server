@@ -15,20 +15,11 @@ export class TaskModel extends TimeStamps {
   date: string;
 
   @prop()
-  description?: string;
+  description: string;
 
   @prop()
   userId: Types.ObjectId;
 
-  // @ForeignKey(() => Project)
-  // @prop()
-  // projectId: number;
-
-  // @BelongsTo(() => UsersModel)
-  // @prop({ ref: () => UsersModel })
-  // author: Ref<UsersModel>;
-
-  // @BelongsTo(() => Project)
-  // @prop()
-  // project: Project;
+  @prop()
+  projectId: string;
 }

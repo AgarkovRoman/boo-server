@@ -21,13 +21,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('create')
-  async createProject(@Body() dto: CreateProjectDto) {
-    return this.projectsService.createProject(dto);
+  async createProject(@Body() dto: CreateProjectDto, @Request() req: any) {
+    return this.projectsService.createProject(dto, req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   async deleteProjectById(@Param('id', IdValidationPipe) id: string) {
     const deletedDoc = await this.projectsService.deleteProjectById(id);
@@ -39,13 +39,13 @@ export class ProjectsController {
     return deletedDoc;
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('byUser')
   async getProjectsByUserId(@Request() req: any) {
     return this.projectsService.getProjectsByUserId(req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateProjectById(
     @Param('id', IdValidationPipe) id: string,
