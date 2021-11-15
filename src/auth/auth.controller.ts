@@ -33,7 +33,7 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   // @ApiOperation({ summary: 'Refresh' })
   // @ApiResponse({ status: 200 })
@@ -43,7 +43,7 @@ export class AuthController {
     return this.authService.refresh(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   // @ApiOperation({ summary: 'Logout' })
   // @ApiResponse({ status: 200 })
